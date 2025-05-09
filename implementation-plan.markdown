@@ -23,12 +23,12 @@ Test: onPush(main) -> vercelBuildStatus == success
 CreateEnvFile()
   // Add .env.local (gitignored)
   // Define required variables:
-  // - DATABASE_URL
-  // - OPENAI_API_KEY
-  // - JWT_SECRET
-  // - NEXT_PUBLIC_API_URL
-  // - AUTH0_DOMAIN (for Phase 2)
-  // - AUTH0_CLIENT_ID (for Phase 2)
+  // - DATABASE_URL="postgresql://user:password@localhost:5432/ai_social_person?schema=public"
+  // - OPENAI_API_KEY="your-openai-api-key"
+  // - JWT_SECRET="your-jwt-secret"
+  // - NEXT_PUBLIC_API_URL="http://localhost:3001"
+  // - AUTH0_DOMAIN="your-auth0-domain"
+  // - AUTH0_CLIENT_ID="your-auth0-client-id"
 Test: vercelEnvPull() populates .env.local
 
 SetVercelEnvVars()

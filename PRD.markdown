@@ -234,7 +234,7 @@ Owners/managers of small cafés, family‑run restaurants, boutique hotels, life
 
 #### Plus
 - $19/m
-- 50 posts per month
+- 100 posts per month
 - 1 brand profile
 - Basic analytics dashboard
 - Email support
@@ -243,7 +243,7 @@ Owners/managers of small cafés, family‑run restaurants, boutique hotels, life
 
 #### Pro
 - $49/m
-- 200 posts per month
+- 300 posts per month
 - 2 brand profiles
 - Advanced analytics suite
 - Priority support via email/chat
@@ -254,7 +254,7 @@ Owners/managers of small cafés, family‑run restaurants, boutique hotels, life
 
 #### Premium
 - $99/m
-- 600 posts per month
+- 700 posts per month
 - 5 brand profiles
 - Advanced analytics suite
 - Priority support via email/chat
