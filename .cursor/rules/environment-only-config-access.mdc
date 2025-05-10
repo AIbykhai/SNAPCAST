@@ -1,0 +1,53 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Environment-Only Config Access
+
+Never hard-code secrets or URLs—use process.env.* via dotenv on both front- and back-end.
+
+## Path Pattern
+**/*.{ts,tsx}
+
+## Implementation Guidelines
+- Use environment variables for all configuration values
+- Never hard-code API keys, secrets, or environment-specific URLs
+- Use dotenv to load environment variables
+- Create a centralized config module that accesses environment variables
+- Include .env.example with placeholder values (no real secrets)
+- Add all .env files to .gitignore except .env.example
+
+## Backend Implementation
+```typescript
+// backend/src/config/index.ts
+import dotenv from 'dotenv';
+dotenv.config();
+
+export const config = {
+  database: {
+    url: process.env.DATABASE_URL,
+  },
+  auth: {
+    secret: process.env.JWT_SECRET,
+    expiresIn: process.env.JWT_EXPIRES_IN || '1d',
+  },
+  api: {
+    port: parseInt(process.env.API_PORT || '3000', 10),
+  },
+};
+```
+
+## Frontend Implementation
+```typescript
+// frontend/src/config/index.ts
+export const config = {
+  api: {
+    baseUrl: process.env.NEXT_PUBLIC_API_URL,
+  },
+  auth: {
+    domain: process.env.NEXT_PUBLIC_AUTH0_DOMAIN,
+    clientId: process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID,
+  },
+};
+```

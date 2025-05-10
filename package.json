@@ -2,7 +2,9 @@
   "name": "memory-bank",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "dev:app": "npm run dev --prefix app"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

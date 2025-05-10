@@ -73,17 +73,36 @@ Test: database has all required tables with proper indexes
 ## 4. Implement Authentication
 
 InstallAuthLibrary()
-  // Add Auth0 (not NextAuth.js)
-  // Configure session and User model
-  // Set up email/password authentication
-  // Prepare for Phase 2 OAuth integration
-Test: GET /api/auth/session returns JSON session object
+  // Add Lucia Auth (`lucia`) and Prisma adapter (`@lucia-auth/adapter-prisma`), and an adapter for Next.js App Router (`@lucia-auth/adapter-nextjs`).
+  // Install hashing library if not already present (e.g., `oslo` for password hashing, or use existing `bcryptjs`).
+  // Configure Lucia instance (lib/auth.ts or similar), initialize Prisma adapter.
+  // Update Prisma schema:
+  //   - Adapt existing `User` model if necessary for Lucia (e.g., ID type, attributes Lucia might manage).
+  //   - Add `Session` model as required by Lucia.
+  //   - Add `Key` model as required by Lucia for password-based login.
+  // Run Prisma migrations to update the database schema.
+  // Set up email/password authentication using Lucia's key mechanism.
+  // (Lucia also supports OAuth for potential Phase 2 integration).
+Test:
+  // - Registration successfully creates a User and Key in the database.
+  // - Login endpoint successfully validates credentials against the Key, creates a Session in the database, and returns a session cookie.
+  // - Logout invalidates the session in the database and clears the session cookie.
 
 WireAuthUI()
-  // Connect login/signup forms to auth endpoints
-  // Implement role-based access control
-  // Set up subscription tier checks
-Test: userCanRegister() && userCanLogin() && sessionCookieExists()
+  // Create custom API Route Handlers (or Server Actions) for:
+  //   - `/api/auth/register`: Handles user registration, password hashing, and User/Key creation.
+  //   - `/api/auth/login`: Handles credential validation, session creation using Lucia, and setting session cookie.
+  //   - `/api/auth/logout`: Handles session invalidation using Lucia and clearing session cookie.
+  // Connect login/signup forms in the UI to these new endpoints.
+  // Implement middleware to protect routes by validating the Lucia session cookie.
+  // Implement helper function (e.g., `validateRequest`) to get user/session in Server Components and Route Handlers.
+  // (Role-based access control and subscription tier checks can be future enhancements based on session data).
+Test:
+  // - userCanRegister() successfully.
+  // - userCanLogin() successfully, and a valid session cookie is set.
+  // - userCanLogout() successfully, and the session cookie is cleared.
+  // - Protected routes/pages are inaccessible without a valid session and redirect to login.
+  // - Authenticated user information can be retrieved from the session.
 
 ---
 

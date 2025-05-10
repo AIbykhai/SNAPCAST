@@ -1,0 +1,56 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Companion Unit Tests
+
+Every *.ts[x] implementation file must have a same-named *.spec.ts[x] in the same folder for 1:1 coverage.
+
+## Path Pattern
+- frontend/**/*.spec.tsx
+- backend/**/*.spec.ts
+
+## Implementation Guidelines
+- Create a test file for every implementation file
+- Tests should be in the same directory as the file being tested
+- Name test files with the same name as the implementation file plus .spec
+- Aim for high coverage (80%+) for all business logic
+- Test both success and error paths
+
+## Example Structure
+```
+frontend/src/features/auth/
+  ├── components/
+  │   ├── LoginForm.tsx
+  │   ├── LoginForm.spec.tsx
+  │   ├── RegisterForm.tsx
+  │   ├── RegisterForm.spec.tsx
+  ├── hooks/
+  │   ├── useAuth.ts
+  │   ├── useAuth.spec.ts
+```
+
+## Test Example
+```typescript
+// UserService.spec.ts
+import { UserService } from './UserService';
+
+describe('UserService', () => {
+  let userService: UserService;
+  
+  beforeEach(() => {
+    userService = new UserService();
+  });
+  
+  describe('findById', () => {
+    it('should return a user when valid ID is provided', async () => {
+      // Test implementation
+    });
+    
+    it('should throw an error when user does not exist', async () => {
+      // Test implementation
+    });
+  });
+});
+```

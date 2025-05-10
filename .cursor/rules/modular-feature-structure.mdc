@@ -1,0 +1,34 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Modular Feature Structure
+
+Enforce modular feature-based organization: every React component, hook or style lives in its own file under its feature folder—no giant monoliths.
+
+## Path Pattern
+frontend/src/features/**/*.{ts,tsx}
+
+## Implementation Guidelines
+- Each React component should be in its own file
+- Each custom hook should be in its own file
+- Each style module should be in its own file
+- Group related files under feature-specific folders
+- Avoid large files with multiple components/hooks
+
+## Example Structure
+```
+frontend/src/features/
+  ├── auth/
+  │   ├── components/
+  │   │   ├── LoginForm.tsx
+  │   │   ├── RegisterForm.tsx
+  │   ├── hooks/
+  │   │   ├── useAuth.ts
+  │   ├── styles/
+  │   │   ├── auth.module.css
+  ├── dashboard/
+  │   ├── components/
+  │   │   ├── DashboardLayout.tsx
+  │   │   ├── AnalyticsCard.tsx
