@@ -64,26 +64,38 @@ export default function AuthPage() {
     setError("")
 
     try {
-      // Call NextAuth signIn
+      // Call NextAuth signIn with error handling
       const result = await signIn("credentials", {
         email: values.email,
         password: values.password,
         redirect: false,
+        callbackUrl: "/dashboard",
       })
 
       if (result?.error) {
+        console.error("Sign in error:", result.error)
         setError("Invalid email or password. Please try again.")
+        toast({
+          title: "Login failed",
+          description: "Invalid email or password",
+          variant: "destructive",
+        })
         return
       }
 
-      // Redirect to welcome screen on successful login
-      router.push("/onboarding/welcome")
+      // Redirect to dashboard on successful login
+      if (result?.url) {
+        router.push(result.url)
+      } else {
+        router.push("/dashboard")
+      }
 
       toast({
         title: "Login successful",
         description: "Welcome back!",
       })
     } catch (error) {
+      console.error("Login error:", error)
       setError("An error occurred during login. Please try again.")
 
       toast({
@@ -101,7 +113,7 @@ export default function AuthPage() {
     setError("")
 
     try {
-      // Register user
+      // Register user with error handling
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
@@ -115,8 +127,13 @@ export default function AuthPage() {
       })
 
       if (!response.ok) {
-        const data = await response.json()
+        const data = await response.json().catch(() => ({ error: "Registration failed" }))
         setError(data.error || "An error occurred during signup. Please try again.")
+        toast({
+          title: "Registration failed",
+          description: data.error || "An error occurred during registration",
+          variant: "destructive",
+        })
         return
       }
 
@@ -125,21 +142,31 @@ export default function AuthPage() {
         email: values.email,
         password: values.password,
         redirect: false,
+        callbackUrl: "/onboarding/welcome",
       })
 
       if (result?.error) {
         setError("Registration successful, but login failed. Please try logging in.")
+        toast({
+          title: "Registration successful",
+          description: "Please log in with your new account",
+        })
         return
       }
 
       // Redirect to welcome screen on successful signup
-      router.push("/onboarding/welcome")
+      if (result?.url) {
+        router.push(result.url)
+      } else {
+        router.push("/onboarding/welcome")
+      }
 
       toast({
         title: "Registration successful",
         description: "Your account has been created",
       })
     } catch (error) {
+      console.error("Registration error:", error)
       setError("An error occurred during signup. Please try again.")
 
       toast({

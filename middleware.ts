@@ -4,40 +4,57 @@ import { getToken } from "next-auth/jwt"
 
 export async function middleware(request: NextRequest) {
   // Skip middleware for NextAuth API routes
-  if (request.nextUrl.pathname.startsWith('/api/auth')) {
+  if (request.nextUrl.pathname.startsWith("/api/auth")) {
     return NextResponse.next()
   }
-  
-  // Rest of your middleware logic
+
+  // Get the pathname
   const path = request.nextUrl.pathname
+
+  // Public paths that don't require authentication
   const publicPaths = ["/auth/login", "/auth/register", "/"]
-  const isPublicPath = publicPaths.some(
-    (publicPath) => path === publicPath || path.startsWith(publicPath)
-  )
-  
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  })
-  
-  if (isPublicPath && token) {
-    return NextResponse.redirect(new URL("/dashboard", request.url))
+
+  // Check if the path is public
+  const isPublicPath = publicPaths.some((publicPath) => path === publicPath || path.startsWith(publicPath))
+
+  try {
+    // Get the token
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    })
+
+    // If the path is public and the user is authenticated, redirect to dashboard
+    if (isPublicPath && token) {
+      return NextResponse.redirect(new URL("/dashboard", request.url))
+    }
+
+    // If the path is not public and the user is not authenticated, redirect to login
+    if (!isPublicPath && !token) {
+      return NextResponse.redirect(new URL("/auth/login", request.url))
+    }
+
+    return NextResponse.next()
+  } catch (error) {
+    console.error("Middleware error:", error)
+    // On error, allow the request to proceed to avoid blocking the application
+    return NextResponse.next()
   }
-  
-  if (!isPublicPath && !token) {
-    return NextResponse.redirect(new URL("/auth/login", request.url))
-  }
-  
-  return NextResponse.next()
 }
 
 export const config = {
   matcher: [
-    "/dashboard/:path*", 
-    "/onboarding/:path*", 
-    "/auth/login", 
-    "/auth/register",
+    // Include your protected routes
+    "/dashboard/:path*",
+    "/onboarding/:path*",
     "/profile",
     "/account-analyst",
+
+    // Include sign-in pages
+    "/auth/login",
+    "/auth/register",
+
+    // IMPORTANT: Exclude NextAuth API routes and static files
+    "/((?!api/auth|_next/static|_next/image|favicon.ico).*)",
   ],
 }
