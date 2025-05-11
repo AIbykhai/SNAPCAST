@@ -3,8 +3,8 @@ import type { NextRequest } from "next/server"
 import { getToken } from "next-auth/jwt"
 
 export async function middleware(request: NextRequest) {
-  // Skip middleware for NextAuth API routes
-  if (request.nextUrl.pathname.startsWith("/api/auth")) {
+  // Skip middleware for all auth-related routes
+  if (request.nextUrl.pathname.startsWith("/api/auth") || request.nextUrl.pathname.startsWith("/auth")) {
     return NextResponse.next()
   }
 
@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // Public paths that don't require authentication
-  const publicPaths = ["/auth/login", "/auth/register", "/"]
+  const publicPaths = ["/"]
 
   // Check if the path is public
   const isPublicPath = publicPaths.some((publicPath) => path === publicPath || path.startsWith(publicPath))
@@ -23,11 +23,6 @@ export async function middleware(request: NextRequest) {
       req: request,
       secret: process.env.NEXTAUTH_SECRET,
     })
-
-    // If the path is public and the user is authenticated, redirect to dashboard
-    if (isPublicPath && token) {
-      return NextResponse.redirect(new URL("/dashboard", request.url))
-    }
 
     // If the path is not public and the user is not authenticated, redirect to login
     if (!isPublicPath && !token) {
@@ -50,11 +45,7 @@ export const config = {
     "/profile",
     "/account-analyst",
 
-    // Include sign-in pages
-    "/auth/login",
-    "/auth/register",
-
-    // IMPORTANT: Exclude NextAuth API routes and static files
-    "/((?!api/auth|_next/static|_next/image|favicon.ico).*)",
+    // Exclude all auth routes and static files
+    "/((?!auth|api/auth|_next/static|_next/image|favicon.ico).*)",
   ],
 }

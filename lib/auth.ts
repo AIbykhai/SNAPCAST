@@ -1,6 +1,6 @@
 import type { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import { compare } from "bcryptjs" // Make sure this is bcryptjs, not bcrypt
+import { compare } from "bcryptjs"
 import { db } from "@/lib/db"
 import { users } from "@/lib/schema"
 import { eq } from "drizzle-orm"
@@ -18,63 +18,85 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-            if (!credentials?.email || !credentials?.password) {
-                return null
-            }
-
-            const user = await db.query.users.findFirst({
-                where: eq(users.email, credentials.email),
-            })
-
-            if (!user) {
-                return null
-            }
-
-            const isPasswordValid = await compare(credentials.password, user.passwordHash)
-
-            if (!isPasswordValid) {
-                return null
-            }
-
-            return {
-                id: user.id.toString(),
-                email: user.email,
-                name: user.name,
-            }
-        } catch (error) {
-            console.error("Auth error:", error)
+          if (!credentials?.email || !credentials?.password) {
             return null
+          }
+
+          // Wrap database operations in try/catch
+          let user
+          try {
+            user = await db.query.users.findFirst({
+              where: eq(users.email, credentials.email),
+            })
+          } catch (dbError) {
+            console.error("Database error:", dbError)
+            // Return null instead of throwing to prevent non-JSON responses
+            return null
+          }
+
+          if (!user) {
+            return null
+          }
+
+          let isPasswordValid
+          try {
+            isPasswordValid = await compare(credentials.password, user.passwordHash)
+          } catch (compareError) {
+            console.error("Password comparison error:", compareError)
+            return null
+          }
+
+          if (!isPasswordValid) {
+            return null
+          }
+
+          return {
+            id: user.id.toString(),
+            email: user.email,
+            name: user.name || "",
+          }
+        } catch (error) {
+          console.error("Auth error:", error)
+          // Return null instead of throwing to prevent non-JSON responses
+          return null
         }
-    }
+      },
     }),
   ],
   callbacks: {
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string
-        session.user.name = token.name as string
-        session.user.email = token.email as string
+      try {
+        if (token) {
+          session.user.id = token.id as string
+          session.user.name = (token.name as string) || ""
+          session.user.email = token.email as string
+        }
+        return session
+      } catch (error) {
+        console.error("Session callback error:", error)
+        return session
       }
-      return session
     },
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
-        token.email = user.email
-        token.name = user.name
+      try {
+        if (user) {
+          token.id = user.id
+          token.email = user.email
+          token.name = user.name || ""
+        }
+        return token
+      } catch (error) {
+        console.error("JWT callback error:", error)
+        return token
       }
-      return token
     },
   },
   pages: {
     signIn: "/auth/login",
-    // You can also customize other pages:
-    // signOut: '/auth/signout',
-    // error: '/auth/error',
-    // newUser: '/auth/new-user'
+    error: "/auth/error", // Add an error page
   },
   // Add these options to help with debugging
-  debug: process.env.NODE_ENV === "development",
+  debug: true,
   logger: {
     error(code, metadata) {
       console.error(`NextAuth error: ${code}`, metadata)
