@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { hash } from "bcrypt"
+import { hash } from "bcryptjs"
 import { db } from "@/lib/db"
 import { users, brandProfiles } from "@/lib/schema"
 import { z } from "zod"
